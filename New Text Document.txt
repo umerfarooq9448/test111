@@ -1,0 +1,146 @@
+private String productName;
+	private Long productPrice;
+	public Product(Long productId, String productName, Long productPrice, String productQuality) {
+		super();
+		this.productId = productId;
+		this.productName = productName;
+		this.productPrice = productPrice;
+		this.productQuality = productQuality;
+	}
+	public Long getProductId() {
+		return productId;
+	}
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
+	public String getProductName() {
+		return productName;
+	}
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+	public Long getProductPrice() {
+		return productPrice;
+	}
+	public void setProductPrice(Long productPrice) {
+		this.productPrice = productPrice;
+	}
+	public String getProductQuality() {
+		return productQuality;
+	}
+	public void setProductQuality(String productQuality) {
+		this.productQuality = productQuality;
+	}
+	private String productQuality;
+
+
+
+
+
+	public List<Product> getAllProducts();
+
+	public void saveProduct(Product product);
+
+	public Product getProductById(Long productId);
+
+	public void deleteById(Long productId);
+
+
+
+
+
+
+@Autowired
+	ProductRepository productRepository;
+	
+	@Override
+	public List<Product> getAllProducts() {
+		
+		return productRepository.findAll();
+	}
+
+	@Override
+	public void saveProduct(Product product) {
+		// TODO Auto-generated method stub
+		productRepository.save(product);
+	}
+
+	@Override
+	public Product getProductById(Long productId) {
+		// TODO Auto-generated method stub
+		
+		Product product = null;
+		Optional<Product> option = productRepository.findById(productId);
+		if(option.isPresent())
+		{
+			product = option.get();
+		}
+		else{
+			new RuntimeException("Sorry record not found for id"+productId);
+		}
+//		 return productRepository.findById(productId).orElse(null);
+		return product;
+	}
+
+	@Override
+	public void deleteById(Long productId) {
+		// TODO Auto-generated method stub
+		productRepository.deleteById(productId);
+	}
+
+
+
+
+
+
+
+	@Autowired
+	ProductService productService;
+	
+	@GetMapping("/")
+	public String getAllProducts(Model model) {
+		
+		model.addAttribute("products",productService.getAllProducts());
+		
+		
+		return "homePage";
+		
+	}
+	
+	@GetMapping("/showNewProductForm")
+	public String showNewProductForm(Model model) {
+		 
+		Product product = new Product();
+		model.addAttribute("product",product);
+		return "newProductForm";
+		
+	}
+	
+	@PostMapping("/saveProduct")
+	public String saveProduct(@ModelAttribute("product")Product product) {
+		productService.saveProduct(product);
+		return "redirect:/";   //------------>redirects to method of /
+	}
+	
+	
+	@GetMapping("/showNewProductUpdateForm/{productId}")
+	public String showNewProductUpdateForm(@PathVariable("productId") Long productId,Model model) {
+		
+		Product product = productService.getProductById(productId);
+		model.addAttribute("product",product);
+		return "newProductUpdateForm";
+	}
+	
+	@GetMapping("/deleteProductById/{productId}")
+	public String deleteById(@PathVariable("productId")Long productId) {
+		
+		productService.deleteById(productId);
+		return"redirect:/";
+	}
+
+
+
+
+
+
+
